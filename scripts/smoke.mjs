@@ -48,7 +48,7 @@ try {
   check('shows 0 / 98 progress', await page.evaluate(() => /0\s*\/\s*98\s*ROBOTS/.test(document.querySelector('.hero-progress')?.textContent ?? '')));
   check('home scene shows 10 real robots', await page.evaluate(() => {
     const imgs = [...document.querySelectorAll('.rw-robot')];
-    return imgs.length === 10 && imgs.every((i) => i.src.includes('/robots/'));
+    return imgs.length === 10 && imgs.every((i) => i.src.includes('/robots'));
   }));
 
   console.log('— hunt: pack → shuffle → locked → correct answer —');

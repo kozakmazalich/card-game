@@ -48,15 +48,18 @@ wrong/timeout: THE ROBOT ESCAPED → try again.
 ## Project structure
 
 ```
-public/robots/           the 98 real robot images (originals)
+public/robots/           the 98 real robot images (originals — card system)
+public/robots-cutout/    background-removed, size-normalized versions (home scene)
 public/fonts/            self-hosted vibe/vibe fonts
 scripts/gen-cards.mjs    regenerates src/data/cards.generated.ts from the images
+scripts/remove-bg.swift  Apple Vision background removal + normalization
+                         (swift scripts/remove-bg.swift public/robots public/robots-cutout)
 scripts/smoke.mjs        e2e smoke test 1 (hunt flow, requires Chrome + dev server)
 scripts/smoke2.mjs       e2e smoke test 2 (duplicates, burn, timeout)
 src/data/cards.ts        card dataset + selectRandomCard() / selectChallengeFor()
 src/data/questions/      question database (JSON, one file per category)
 src/game/                store (zustand + localStorage), wallet, sounds, achievements
-src/components/          background, robot card, particles, nav, toasts
+src/components/          background, robot world, robot card, particles, nav, toasts
 src/screens/             home, hunt, collection, profile, leaderboard, how-to-play
 ```
 

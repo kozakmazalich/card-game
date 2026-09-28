@@ -4,12 +4,10 @@ import type { Rarity, RobotCard } from '../data/types';
 import { sfx } from '../game/sounds';
 
 /**
- * 10 real robots from the collection walking through a pseudo-3D world.
- * Pure 2D DOM/CSS: perspective floor, platforms, lighting, fog, particles,
- * depth-banded sprites, camera parallax — driven by a single rAF loop.
- *
- * Robots are interactive: hover lifts them, and clicking one makes it chase
- * the cursor across the whole page until clicked again.
+ * The home world: pure black scene, one continuous moving road, sparse
+ * street lamps, and 10 real robots (background-removed, size-normalized)
+ * traveling along it. Robots stay clickable — clicking one makes it chase
+ * the cursor until clicked again.
  */
 
 const PICK_ORDER: Rarity[] = ['legendary', 'epic', 'rare', 'uncommon', 'common'];
@@ -22,11 +20,20 @@ const RARITY_COLOR: Record<Rarity, string> = {
   legendary: '#ccff00',
 };
 
+const ROAD_Y = 232;
+
+const LAMPS = [
+  { left: '6%', ld: -2, ldur: 13 },
+  { left: '21%', ld: -8, ldur: 10 },
+  { left: '36%', ld: -5, ldur: 15 },
+  { left: '53%', ld: -11, ldur: 9 },
+  { left: '69%', ld: -3, ldur: 12 },
+  { left: '85%', ld: -7, ldur: 14 },
+];
+
 interface Sprite {
   card: RobotCard;
-  band: 0 | 1 | 2;
   y: number;
-  scale: number;
   speed: number;
   dir: 1 | -1;
   x: number; // scene-width %
@@ -34,7 +41,6 @@ interface Sprite {
   bobAmp: number;
   bobPhase: number;
   tilt: number;
-  blur: number;
   z: number;
   idleUntil: number;
   following: boolean;
@@ -43,32 +49,22 @@ interface Sprite {
   hover: boolean;
 }
 
-const BANDS = [
-  { y: 118, scale: 0.68, z: 4, blur: 0.6, speedMul: 0.5 },
-  { y: 200, scale: 0.95, z: 14, blur: 0, speedMul: 0.78 },
-  { y: 272, scale: 1.32, z: 26, blur: 0, speedMul: 1.1 },
-];
-
 function makeSprites(): Sprite[] {
   const picks: RobotCard[] = PICK_ORDER.flatMap((r) => CARDS.filter((c) => c.rarity === r).slice(0, 2));
   return picks.map((card, i) => {
-    const band = (i % 3) as 0 | 1 | 2;
-    const b = BANDS[band];
     const r = (n: number) => (Math.abs(Math.sin(i * 9301 + n * 49297)) * 233280) % 1;
+    const y = ROAD_Y + (i % 2 === 0 ? 6 : -5);
     return {
       card,
-      band,
-      y: b.y + (i % 2 === 0 ? 6 : -8),
-      scale: b.scale,
-      speed: 5 + r(1) * 9 * b.speedMul,
+      y,
+      speed: 6 + r(1) * 9,
       dir: i % 2 === 0 ? 1 : -1,
       x: 4 + ((i * 9.4) % 88),
       bobFreq: 4.5 + r(2) * 3.5,
       bobAmp: 2.6 + r(3) * 3.2,
       bobPhase: r(4) * Math.PI * 2,
       tilt: (r(5) - 0.5) * 4,
-      blur: b.blur,
-      z: b.z + (i % 3),
+      z: 10 + Math.round((y - 220) / 4),
       idleUntil: 0,
       following: false,
       fx: 0,
@@ -77,13 +73,6 @@ function makeSprites(): Sprite[] {
     };
   });
 }
-
-const SPARKLES = Array.from({ length: 22 }, (_, i) => ({
-  left: `${(i * 41.3 + 7) % 96}%`,
-  top: `${(i * 29.7 + 5) % 90}%`,
-  delay: `${(i % 8) * 0.9}s`,
-  cls: i % 3 === 0 ? ' iris' : i % 3 === 1 ? ' amber' : '',
-}));
 
 export default function RobotWorld() {
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -107,11 +96,6 @@ export default function RobotWorld() {
       tags.push(scene.querySelector(`[data-tag="${i}"]`));
     });
 
-    const sky = scene.querySelector<HTMLElement>('.rw-sky');
-    const grid = scene.querySelector<HTMLElement>('.rw-grid');
-    const glowA = scene.querySelector<HTMLElement>('.rw-glow-a');
-    const glowB = scene.querySelector<HTMLElement>('.rw-glow-b');
-
     let rect = scene.getBoundingClientRect();
     const updateRect = () => {
       rect = scene.getBoundingClientRect();
@@ -126,8 +110,7 @@ export default function RobotWorld() {
     window.addEventListener('pointermove', onMove, { passive: true });
 
     const release = (s: Sprite, wrap: HTMLElement | null) => {
-      const xPct = Math.min(112, Math.max(-12, ((s.fx - rect.left) / Math.max(1, rect.width)) * 100));
-      s.x = xPct;
+      s.x = Math.min(112, Math.max(-12, ((s.fx - rect.left) / Math.max(1, rect.width)) * 100));
       s.y = Math.min(rect.height - 20, Math.max(-90, s.fy - rect.top));
       s.following = false;
       if (wrap) {
@@ -183,23 +166,25 @@ export default function RobotWorld() {
       handlers.push({ el: wrap, enter, leave, click });
     });
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) {
-      sprites.forEach((s, i) => {
-        wraps[i]!.style.transform = `translate3d(${(s.x / 100) * rect.width}px, ${s.y}px, 0)`;
+    const cleanup = () => {
+      window.removeEventListener('resize', updateRect);
+      window.removeEventListener('scroll', updateRect);
+      window.removeEventListener('pointermove', onMove);
+      handlers.forEach((h) => {
+        if (h.el) {
+          h.el.removeEventListener('pointerenter', h.enter);
+          h.el.removeEventListener('pointerleave', h.leave);
+          h.el.removeEventListener('click', h.click);
+        }
       });
-      return () => {
-        window.removeEventListener('resize', updateRect);
-        window.removeEventListener('scroll', updateRect);
-        window.removeEventListener('pointermove', onMove);
-        handlers.forEach((h) => {
-          if (h.el) {
-            h.el.removeEventListener('pointerenter', h.enter);
-            h.el.removeEventListener('pointerleave', h.leave);
-            h.el.removeEventListener('click', h.click);
-          }
-        });
-      };
+    };
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      sprites.forEach((s, i) => {
+        const w = wraps[i];
+        if (w) w.style.transform = `translate3d(${(s.x / 100) * rect.width}px, ${s.y}px, 0)`;
+      });
+      return cleanup;
     }
 
     let raf = 0;
@@ -208,16 +193,6 @@ export default function RobotWorld() {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const t = now * 0.001;
-
-      // Camera parallax from the cursor.
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const px = mouse.current.x === -9999 ? 0 : (mouse.current.x - cx) / Math.max(1, rect.width);
-      const py = mouse.current.x === -9999 ? 0 : (mouse.current.y - cy) / Math.max(1, rect.height);
-      if (sky) sky.style.transform = `translate3d(${px * 10}px, ${py * 6}px, 0)`;
-      if (grid) grid.style.transform = `translate3d(${px * -18}px, 0, 0) rotateX(64deg)`;
-      if (glowA) glowA.style.transform = `translate3d(${px * 26}px, ${py * 16}px, 0)`;
-      if (glowB) glowB.style.transform = `translate3d(${px * -20}px, ${py * -12}px, 0)`;
 
       for (let i = 0; i < sprites.length; i++) {
         const s = sprites[i];
@@ -229,7 +204,6 @@ export default function RobotWorld() {
         if (!wrap || !img || !sh || !aura || !tag) continue;
 
         if (s.following) {
-          // Chase the cursor with soft easing + banking into turns.
           const k = 0.15;
           const vx = (mouse.current.x - s.fx) * k;
           const vy = (mouse.current.y - s.fy) * k;
@@ -264,11 +238,11 @@ export default function RobotWorld() {
 
         const bob = s.idleUntil ? 0 : Math.sin(t * s.bobFreq + s.bobPhase) * s.bobAmp;
         const sway = s.idleUntil ? 0 : Math.sin(t * s.bobFreq * 2 + s.bobPhase) * 1.1;
-        const lift = s.hover ? 1.09 : 1;
+        const lift = s.hover ? 1.08 : 1;
         wrap.style.transform = `translate3d(${(s.x / 100) * rect.width}px, ${s.y}px, 0)`;
-        img.style.transform = `scale(${s.dir * s.scale * lift}, ${s.scale * lift}) translateY(${bob}px) rotate(${s.tilt + sway}deg)`;
-        sh.style.opacity = String(0.3 + s.band * 0.12);
-        aura.style.opacity = s.hover ? '0.6' : '0';
+        img.style.transform = `scale(${s.dir * lift}, ${lift}) translateY(${bob}px) rotate(${s.tilt + sway}deg)`;
+        sh.style.opacity = '0.32';
+        aura.style.opacity = s.hover ? '0.55' : '0';
         tag.style.opacity = s.hover ? '1' : '0';
       }
       raf = requestAnimationFrame(tick);
@@ -277,30 +251,28 @@ export default function RobotWorld() {
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener('resize', updateRect);
-      window.removeEventListener('scroll', updateRect);
-      window.removeEventListener('pointermove', onMove);
-      handlers.forEach((h) => {
-        if (h.el) {
-          h.el.removeEventListener('pointerenter', h.enter);
-          h.el.removeEventListener('pointerleave', h.leave);
-          h.el.removeEventListener('click', h.click);
-        }
-      });
+      cleanup();
     };
   }, [sprites]);
 
   return (
-    <div className="rw-scene" ref={sceneRef} aria-label="Robot world — click a robot to make it follow your cursor">
-      <div className="rw-stage">
-        <div className="rw-sky" />
-        <div className="rw-horizon" />
-        <div className="rw-glow rw-glow-a" />
-        <div className="rw-glow rw-glow-b" />
-        <div className="rw-grid" />
-        <div className="rw-platform rw-platform-back" />
-        <div className="rw-platform rw-platform-mid" />
-        <div className="rw-platform rw-platform-front" />
+    <div className="rw-scene" ref={sceneRef} aria-label="Robot world — robots travel a moving road. Click one to make it follow your cursor.">
+      <div className="rw-lamps" aria-hidden="true">
+        {LAMPS.map((l, i) => (
+          <span key={i} className="rw-lamp" style={{ left: l.left, ['--ld' as string]: `${l.ld}s`, ['--ldur' as string]: `${l.ldur}s` }}>
+            <span className="rw-lamp-head" />
+            <span className="rw-lamp-pole" />
+            <span className="rw-lamp-cone" />
+            <span className="rw-lamp-reflect" />
+          </span>
+        ))}
+      </div>
+      <div className="rw-road" aria-hidden="true">
+        <span className="rw-road-edge rw-road-top" />
+        <span className="rw-road-marks" />
+        <span className="rw-road-marks rw-road-marks-rev" />
+        <span className="rw-road-center" />
+        <span className="rw-road-edge rw-road-bottom" />
       </div>
       {sprites.map((s, i) => (
         <div
@@ -316,30 +288,19 @@ export default function RobotWorld() {
           <img
             className="rw-robot"
             data-robot={i}
-            src={s.card.image}
+            src={s.card.image.replace('/robots/', '/robots-cutout/')}
             alt=""
             decoding="async"
             draggable={false}
-            style={{
-              transform: `scale(${s.dir * s.scale}, ${s.scale})`,
-              filter: s.blur ? `blur(${s.blur}px) brightness(0.94)` : undefined,
-            }}
+            style={{ transform: `scale(${s.dir}, 1)` }}
           />
           <span className="rw-tag" data-tag={i}>
             <strong>{s.card.name}</strong>
             <em style={{ color: RARITY_COLOR[s.card.rarity] }}>{s.card.rarity}</em>
           </span>
-          <span className="rw-shadow" data-shadow={i} style={{ transform: `scale(${s.scale}, 1)`, opacity: 0.3 + s.band * 0.12 }} />
+          <span className="rw-shadow" data-shadow={i} style={{ opacity: 0.32 }} />
         </div>
       ))}
-      <div className="rw-sparkles">
-        {SPARKLES.map((p, i) => (
-          <span key={i} className={`bg-sparkle${p.cls}`} style={{ left: p.left, top: p.top, animationDelay: p.delay }} />
-        ))}
-      </div>
-      <div className="rw-sweep" />
-      <div className="rw-fog" />
-      <div className="rw-vignette" />
     </div>
   );
 }
