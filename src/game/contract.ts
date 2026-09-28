@@ -11,8 +11,8 @@ import type { ClaimProof } from './api';
  * and the game never fabricates addresses or hashes.
  */
 export const ROBOT_HUNT_CONTRACT = {
-  /** Fill in after deployment — never a guessed address. */
-  address: null as `0x${string}` | null,
+  /** Deployed on Robinhood Chain Testnet (verified on-chain 2026-09-28). */
+  address: '0x8b6f5B47109E41476A48D8Bc902A3A405a99BBAB' as `0x${string}`,
   chainId: ROBINHOOD_TESTNET.chainId,
   chainName: ROBINHOOD_TESTNET.name,
 } as const;
@@ -34,11 +34,14 @@ function pad32(value: string | number | bigint): string {
   return BigInt(value).toString(16).padStart(64, '0');
 }
 
-/** Encodes claim(uint256 cardId, bytes proof) — proof = r(32)‖s(32)‖v(1). */
+/** Encodes claim(uint256 cardId, bytes proof) — proof = r(32)‖s(32)‖v(1).
+ *  ABI layout: selector | cardId | 0x40 (bytes offset) | 65 (len) | r | s | v.
+ *  Verified byte-for-byte against ethers encoding, and the encoded call
+ *  passes eth_call on the deployed contract. */
 export function encodeClaimCalldata(cardId: number, proof: ClaimProof): string {
   const bytes = proof.r.slice(2).padStart(64, '0') + proof.s.slice(2).padStart(64, '0') + BigInt(proof.v).toString(16).padStart(2, '0');
   const data = bytes.padEnd(192, '0'); // 65 bytes padded to 3 words
-  return `${CLAIM_SELECTOR}${pad32(cardId)}${pad32(0x60)}${pad32(0x41)}${data}`;
+  return `${CLAIM_SELECTOR}${pad32(cardId)}${pad32(0x40)}${pad32(0x41)}${data}`;
 }
 
 /** Encodes burn(uint256 cardId). */

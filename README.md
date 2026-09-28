@@ -124,19 +124,14 @@ scripts/vercel-deploy.mjs` (reads the git-ignored `.env.deploy`).
 
 ### Saving progress on-chain (per wallet address)
 
-1. Deploy `contracts/RobotHuntCollection.sol` (compiles cleanly with solc
-   0.8.20) to Robinhood Chain Testnet via Remix + MetaMask using the funded
-   wallet `0x314e…bcd6d`. **Constructor arg = the backend signer address
-   `0x126A50B0E91d5720dd7653080F94132a3dcd64F5`** (also on `GET /api/signer`).
-2. Paste the deployed contract address into `ROBOT_HUNT_CONTRACT.address` in
-   `src/game/contract.ts` and redeploy. Claims and burns then go on-chain
-   automatically (the UI already has the tx + explorer-link flow built).
-3. Flow: win challenge → server signs `(player, cardId)` → player wallet
-   sends `claim(cardId, proof)` → ownership recorded per address on chain
-   46630.
+**Contract deployed on chain 46630:** `0x8b6f5B47109E41476A48D8Bc902A3A405a99BBAB`
+(verified on-chain: code present, `signer()` = the backend signer; the full
+proof→claim path passes `eth_call`).
 
-Until the contract is deployed, all progress stays local — and the game
-never pretends otherwise.
+Flow: win challenge → server signs `(player, cardId)` → the player wallet
+sends `claim(cardId, proof)` → ownership is recorded per address on
+Robinhood Chain Testnet. The UI already drives this automatically once a
+real wallet is connected; until then claims stay local and the game says so.
 
 ## Validation
 
