@@ -99,4 +99,21 @@ export const sfx = {
     tone({ freq: 988, dur: 0.12, type: 'triangle', gain: 0.07, delay: 0.1 });
     tone({ freq: 1175, dur: 0.2, type: 'triangle', gain: 0.08, delay: 0.2 });
   },
+  clawDescend() {
+    tone({ freq: 320, dur: 0.5, type: 'sawtooth', gain: 0.035, glide: 130 });
+  },
+  clawAscend() {
+    tone({ freq: 150, dur: 0.42, type: 'sawtooth', gain: 0.035, glide: 360 });
+  },
+  clawOpen() {
+    tone({ freq: 760, dur: 0.05, type: 'square', gain: 0.035 });
+    tone({ freq: 560, dur: 0.06, type: 'square', gain: 0.03, delay: 0.05 });
+  },
+  clawSlip() {
+    tone({ freq: 520, dur: 0.22, type: 'sawtooth', gain: 0.05, glide: 160 });
+    tone({ freq: 95, dur: 0.14, type: 'sine', gain: 0.09, delay: 0.16, glide: 45 });
+  },
+  clawThud() {
+    tone({ freq: 95, dur: 0.14, type: 'sine', gain: 0.08, glide: 48 });
+  },
 };

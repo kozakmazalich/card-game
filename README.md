@@ -34,6 +34,10 @@ npm run build      # production build → dist/
 
 ## Game loop
 
+The home page hosts a **claw machine**: move the claw over a robot, hold to
+grab it, carry it (it swings and slips if you jerk the controls) and drop it
+into the collection box to claim it. The hunt screen keeps the classic loop:
+
 OPEN PACK → shuffle → CARD FOUND → CARD LOCKED → 30s HUMAN CHECK →
 correct: unlock animation + CLAIM (or DUPLICATE → KEEP / BURN → +1 ROBOT SCRAP)
 wrong/timeout: THE ROBOT ESCAPED → try again.

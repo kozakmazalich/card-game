@@ -3,7 +3,7 @@ import { useGame } from '../game/store';
 import { sfx } from '../game/sounds';
 import { navigate } from '../game/router';
 import CountUp from '../components/CountUp';
-import RobotWorld from '../components/RobotWorld';
+import ClawMachine from '../components/ClawMachine';
 
 export default function Home() {
   const owned = useGame((s) => s.owned);
@@ -51,7 +51,7 @@ export default function Home() {
           </button>
         </div>
 
-        <RobotWorld />
+        <ClawMachine />
       </section>
 
       <section className="stat-strip" aria-label="Your stats">
