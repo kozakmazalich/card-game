@@ -1,0 +1,14 @@
+[
+  {
+    "id": "gtd_template_001",
+    "category": "gtd",
+    "difficulty": "medium",
+    "question": "DRAFT TEMPLATE — GTD eligibility / requirements questions go here.",
+    "answers": ["", "", "", ""],
+    "correctAnswer": "",
+    "source": "Official Meta Alchemist announcements (to be verified)",
+    "verified": false,
+    "active": false,
+    "note": "DRAFT — populate from verified GTD announcements only."
+  }
+]

@@ -1,0 +1,85 @@
+[
+  {
+    "id": "spark_chain_001",
+    "category": "spark",
+    "difficulty": "medium",
+    "question": "On which chain does the SPARK buyback dashboard read burns?",
+    "answers": ["Base", "Robinhood Chain Testnet", "Arbitrum", "Polygon"],
+    "correctAnswer": "Base",
+    "source": "vibe/vibe site — /spark-burns",
+    "sourceUrl": "https://testnet.vibevibe.fun/spark-burns",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "spark_fee_001",
+    "category": "spark",
+    "difficulty": "medium",
+    "question": "How much is the hook fee on SPARK trades?",
+    "answers": ["2%", "1%", "5%", "0.5%"],
+    "correctAnswer": "2%",
+    "source": "vibe/vibe site — /spark-burns",
+    "sourceUrl": "https://testnet.vibevibe.fun/spark-burns",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "spark_start_001",
+    "category": "spark",
+    "difficulty": "hard",
+    "question": "When did the SPARK buybacks & burns tracking start?",
+    "answers": ["23 Aug 2026", "01 Jan 2026", "23 Aug 2025", "15 Sep 2026"],
+    "correctAnswer": "23 Aug 2026",
+    "source": "vibe/vibe site — /spark-burns",
+    "sourceUrl": "https://testnet.vibevibe.fun/spark-burns",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "spark_burnaddr_001",
+    "category": "spark",
+    "difficulty": "easy",
+    "question": "What are the last characters of the SPARK burn address?",
+    "answers": ["dEaD", "FFFF", "0000", "BURN"],
+    "correctAnswer": "dEaD",
+    "source": "vibe/vibe site — /spark-burns",
+    "sourceUrl": "https://testnet.vibevibe.fun/spark-burns",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "spark_flow_001",
+    "category": "spark",
+    "difficulty": "medium",
+    "question": "What is the flow of SPARK trading fees?",
+    "answers": [
+      "Trading fees → buyback → burn address",
+      "Trading fees → treasury → airdrop",
+      "Trading fees → staking rewards",
+      "Trading fees → team wallet"
+    ],
+    "correctAnswer": "Trading fees → buyback → burn address",
+    "source": "vibe/vibe site — /spark-burns",
+    "sourceUrl": "https://testnet.vibevibe.fun/spark-burns",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "spark_explorer_001",
+    "category": "spark",
+    "difficulty": "hard",
+    "question": "Which explorer does the SPARK transparency page link to?",
+    "answers": ["Base Blockscout", "Etherscan", "Arbiscan", "Basescan"],
+    "correctAnswer": "Base Blockscout",
+    "source": "vibe/vibe site — /spark-burns",
+    "sourceUrl": "https://testnet.vibevibe.fun/spark-burns",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  }
+]

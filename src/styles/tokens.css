@@ -1,0 +1,289 @@
+/* ============================================================
+   ROBOT HUNT — design tokens
+   Visual language follows vibe/vibe (testnet.vibevibe.fun):
+   dark panels, #5bd08a green + #ccff00 lime accents, iris violet,
+   amber gold, Clash Display headings, JetBrains Mono numerals.
+   Fonts are the site's own self-hosted woff2 files (free licenses).
+   ============================================================ */
+
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/instrumentsans-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/jetbrainsmono-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Clash Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/clashdisplay-500-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Clash Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/clashdisplay-600-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Clash Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/clashdisplay-700-latin.woff2') format('woff2');
+}
+
+:root {
+  /* Surfaces */
+  --bg: #0c0e10;
+  --bg-2: #101214;
+  --panel: #16191c;
+  --panel-2: #1c1f24;
+  --panel-3: #22262b;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+
+  /* Ink */
+  --ink: #f5f6f7;
+  --body: #b7bdc0;
+  --muted: #6b7078;
+  --faint: #3a4046;
+
+  /* Brand */
+  --green: #5bd08a;
+  --green-hi: #7ce8a4;
+  --green-deep: #0f7a40;
+  --green-ink: #06130b;
+  --lime: #ccff00;
+  --iris: #8b87d9;
+  --iris-deep: #6a63c8;
+  --amber: #e0b04e;
+  --danger: #e5484d;
+  --danger-tint: rgba(229, 72, 77, 0.14);
+
+  /* Rarity */
+  --r-common: #9aa1a6;
+  --r-uncommon: #5bd08a;
+  --r-rare: #8b87d9;
+  --r-epic: #e0b04e;
+  --r-legendary: #ccff00;
+
+  /* Type */
+  --font-display: 'Clash Display', 'Instrument Sans', -apple-system, sans-serif;
+  --font-ui: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --fs-fine: 12px;
+  --fs-body: 14px;
+  --fs-emph: 15.5px;
+
+  /* Shape */
+  --r-card: 14px;
+  --r-control: 10px;
+  --r-chip: 999px;
+
+  /* Motion */
+  --dur-micro: 0.18s;
+  --dur-enter: 0.22s;
+  --dur-panel: 0.28s;
+  --ease-move: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Layout */
+  --nav-h: 60px;
+  --bottom-h: 64px;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--green) 40%, transparent);
+}
+
+a {
+  color: var(--green);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- shared primitives ---------- */
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mono-label.green {
+  color: var(--green);
+}
+
+.mono-label.amber {
+  color: var(--amber);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--panel-3);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: var(--r-control);
+  cursor: pointer;
+  transition:
+    transform var(--dur-micro) var(--ease-out),
+    background var(--dur-micro),
+    border-color var(--dur-micro),
+    box-shadow var(--dur-micro);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background: var(--panel-3);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-primary {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--green-ink);
+  font-weight: 700;
+  box-shadow:
+    0 0 0 0 color-mix(in srgb, var(--green) 35%, transparent),
+    0 8px 24px -12px color-mix(in srgb, var(--green) 55%, transparent);
+}
+
+.btn-primary:hover {
+  background: var(--green-hi);
+  border-color: var(--green-hi);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--green) 22%, transparent);
+}
+
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+  font-weight: 700;
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--line-strong);
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-big {
+  font-size: 17px;
+  padding: 16px 28px;
+  border-radius: var(--r-card);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.panel {
+  background: linear-gradient(180deg, var(--panel) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+}
+
+.hairline-t {
+  border-top: 1px solid var(--line);
+}
+
+/* scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--faint) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--faint);
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "x_template_001",
+    "category": "x_posts",
+    "difficulty": "hard",
+    "question": "DRAFT TEMPLATE — e.g. What did Meta Alchemist announce in its <date> X post about <topic>?",
+    "answers": ["", "", "", ""],
+    "correctAnswer": "",
+    "source": "Meta Alchemist X account (to be verified)",
+    "verified": false,
+    "active": false,
+    "note": "DRAFT — only questions verified against official Meta Alchemist X posts should be activated here."
+  }
+]

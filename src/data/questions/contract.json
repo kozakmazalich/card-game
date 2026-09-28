@@ -1,0 +1,14 @@
+[
+  {
+    "id": "contract_template_001",
+    "category": "contract",
+    "difficulty": "hard",
+    "question": "DRAFT TEMPLATE — verified token contract details questions go here.",
+    "answers": ["", "", "", ""],
+    "correctAnswer": "",
+    "source": "Verified on-chain contract (to be verified)",
+    "verified": false,
+    "active": false,
+    "note": "DRAFT — only activate questions backed by a verified contract address."
+  }
+]

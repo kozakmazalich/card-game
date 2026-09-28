@@ -1,0 +1,111 @@
+[
+  {
+    "id": "vv_fees_001",
+    "category": "vibevibe",
+    "difficulty": "medium",
+    "question": "How much of the vibe viber trading fees go toward tokenized AI stocks?",
+    "answers": ["95%", "50%", "75%", "10%"],
+    "correctAnswer": "95%",
+    "source": "vibe/vibe site — /vibe-vibers",
+    "sourceUrl": "https://testnet.vibevibe.fun/vibe-vibers",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "vv_x_001",
+    "category": "x_posts",
+    "difficulty": "easy",
+    "question": "What is the official vibe/vibe X handle?",
+    "answers": ["@vibevibefun", "@vibevibe", "@vibevibers", "@robinhoodvibe"],
+    "correctAnswer": "@vibevibefun",
+    "source": "vibe/vibe site — social links",
+    "sourceUrl": "https://testnet.vibevibe.fun/",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "vv_tg_001",
+    "category": "ecosystem",
+    "difficulty": "easy",
+    "question": "What is the official vibe/vibe Telegram handle?",
+    "answers": ["@vibevibefun", "@vibevibe_io", "@sparklabs", "@vibers_xyz"],
+    "correctAnswer": "@vibevibefun",
+    "source": "vibe/vibe site — social links",
+    "sourceUrl": "https://testnet.vibevibe.fun/",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "vv_operator_001",
+    "category": "vibevibe",
+    "difficulty": "hard",
+    "question": "Which organization operates the vibe/vibe platform?",
+    "answers": [
+      "SPARK LABS ORGANIZATION, S.A.",
+      "VibeVibe Labs Inc.",
+      "Robinhood Labs Ltd.",
+      "Meta Alchemist DAO"
+    ],
+    "correctAnswer": "SPARK LABS ORGANIZATION, S.A.",
+    "source": "vibe/vibe site — legal disclosure",
+    "sourceUrl": "https://testnet.vibevibe.fun/",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "vv_collection_001",
+    "category": "vibevibe",
+    "difficulty": "easy",
+    "question": "What is the name of the robot PFP collection on vibe/vibe?",
+    "answers": ["vibe vibers", "spark robots", "meta alchemists", "vibe raiders"],
+    "correctAnswer": "vibe vibers",
+    "source": "vibe/vibe site — /vibe-vibers",
+    "sourceUrl": "https://testnet.vibevibe.fun/vibe-vibers",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "vv_stocks_001",
+    "category": "vibevibe",
+    "difficulty": "medium",
+    "question": "Which tokenized AI stocks appear on the vibe vibers page?",
+    "answers": ["NVDA, SPCX, OpenAI", "TSLA, AAPL, MSFT", "NVDA, AMD, INTC", "BTC, ETH, SOL"],
+    "correctAnswer": "NVDA, SPCX, OpenAI",
+    "source": "vibe/vibe site — /vibe-vibers stock cubes",
+    "sourceUrl": "https://testnet.vibevibe.fun/vibe-vibers",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "vv_quote_001",
+    "category": "vibevibe",
+    "difficulty": "medium",
+    "question": "What are vibe/vibe launches, trades and faucet mints quoted in?",
+    "answers": ["A test stock token", "USDT", "ETH", "SPARK"],
+    "correctAnswer": "A test stock token",
+    "source": "vibe/vibe site — regional notice",
+    "sourceUrl": "https://testnet.vibevibe.fun/",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  },
+  {
+    "id": "vv_legal_001",
+    "category": "vibevibe",
+    "difficulty": "legendary",
+    "question": "What is the legal contact email of the vibe/vibe operator?",
+    "answers": ["legal@vibevibe.fun", "support@vibevibe.fun", "legal@sparklabs.io", "hello@vibevibe.fun"],
+    "correctAnswer": "legal@vibevibe.fun",
+    "source": "vibe/vibe site — legal disclosure",
+    "sourceUrl": "https://testnet.vibevibe.fun/",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "id": "rh_testnet_001",
+    "category": "robinhood",
+    "difficulty": "easy",
+    "question": "Which network is the vibe/vibe launchpad deployed on?",
+    "answers": ["Robinhood Chain Testnet", "Base Mainnet", "Arbitrum", "Solana"],
+    "correctAnswer": "Robinhood Chain Testnet",
+    "source": "vibe/vibe site — page title",
+    "sourceUrl": "https://testnet.vibevibe.fun/",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28"
+  }
+]

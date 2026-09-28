@@ -1,0 +1,51 @@
+[
+  {
+    "id": "ma_pfp_001",
+    "category": "meta_alchemist_pfp",
+    "difficulty": "medium",
+    "question": "Does Meta Alchemist robot PFP got white dot at his pants?",
+    "answers": ["YES", "NO"],
+    "correctAnswer": "YES",
+    "source": "Meta Alchemist X profile picture",
+    "verified": true,
+    "active": true,
+    "verifiedAt": "2026-09-28",
+    "note": "Answer confirmed by the product owner."
+  },
+  {
+    "id": "ma_gtd_spark_001",
+    "category": "gtd",
+    "difficulty": "medium",
+    "question": "How many tokens $SPARK you have to buy to get GTD to mint NFT?",
+    "answers": ["", "", "", ""],
+    "correctAnswer": "",
+    "source": "Meta Alchemist announcements (to be verified)",
+    "verified": false,
+    "active": false,
+    "note": "DRAFT — fill in the verified token requirement and answer options."
+  },
+  {
+    "id": "ma_gtd_tokens_001",
+    "category": "gtd",
+    "difficulty": "medium",
+    "question": "What tokens you have you buy to get GTD?",
+    "answers": ["", "", "", ""],
+    "correctAnswer": "",
+    "source": "Meta Alchemist announcements (to be verified)",
+    "verified": false,
+    "active": false,
+    "note": "DRAFT — fill in the verified token list and answer options."
+  },
+  {
+    "id": "ma_contract_spark_001",
+    "category": "contract",
+    "difficulty": "hard",
+    "question": "What are the last 3 digits of $SPARK contract?",
+    "answers": ["", "", "", ""],
+    "correctAnswer": "",
+    "source": "Verified $SPARK token contract (to be verified)",
+    "verified": false,
+    "active": false,
+    "note": "DRAFT — fill in the last 3 characters of the verified $SPARK contract address."
+  }
+]
