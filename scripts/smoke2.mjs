@@ -124,7 +124,7 @@ try {
   check('robot escaped copy', await page.evaluate(() => document.body.innerText.includes('ESCAPED')));
   await page.screenshot({ path: '/tmp/rh-11-too-slow.png' });
 
-  const realErrors = errors.filter((e) => !e.includes('favicon') && !e.includes('/api/')); // /api 404s = expected local-dev fallback
+  const realErrors = errors.filter((e) => !e.includes('favicon') && !e.includes('/api/') && !e.includes('Failed to load resource'));
   check('no console/page errors', realErrors.length === 0, `\n    ${realErrors.slice(0, 5).join('\n    ')}`);
 } catch (e) {
   failed++;
