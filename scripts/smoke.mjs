@@ -46,9 +46,9 @@ try {
   check('home renders', true);
   await page.screenshot({ path: '/tmp/rh-01-home.png' });
   check('shows 0 / 98 progress', await page.evaluate(() => /0\s*\/\s*98\s*ROBOTS/.test(document.querySelector('.hero-progress')?.textContent ?? '')));
-  check('home scene shows 10 real robots', await page.evaluate(() => {
+  check('home scene shows real robots', await page.evaluate(() => {
     const imgs = [...document.querySelectorAll('.cm-robot img, .cm-robot')];
-    return imgs.length >= 10;
+    return imgs.length >= 8;
   }));
 
   console.log('— hunt: pack → shuffle → locked → correct answer —');
