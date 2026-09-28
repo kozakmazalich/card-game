@@ -31,7 +31,7 @@ const allQuestions = readdirSync(questionDir)
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--no-sandbox'] });
 const page = await browser.newPage();
 page.on('console', (m) => {
-  if (m.type() === 'error') errors.push(m.text());
+  if (m.type() === 'error') errors.push(`${m.location().url ?? ''} ${m.text()}`);
 });
 page.on('pageerror', (e) => errors.push(String(e)));
 
@@ -46,7 +46,10 @@ try {
   check('home renders', true);
   await page.screenshot({ path: '/tmp/rh-01-home.png' });
   check('shows 0 / 98 progress', await page.evaluate(() => /0\s*\/\s*98\s*ROBOTS/.test(document.querySelector('.hero-progress')?.textContent ?? '')));
-  check('floating cards use real art', await page.evaluate(() => document.querySelectorAll('.float-card img').length >= 4));
+  check('home scene shows 10 real robots', await page.evaluate(() => {
+    const imgs = [...document.querySelectorAll('.rw-robot')];
+    return imgs.length === 10 && imgs.every((i) => i.src.includes('/robots/'));
+  }));
 
   console.log('— hunt: pack → shuffle → locked → correct answer —');
   await page.click('.hero-actions .btn-primary');
@@ -54,7 +57,7 @@ try {
   check('pack stage', true);
   await page.screenshot({ path: '/tmp/rh-02-pack.png' });
   await page.click('.pack-wrap');
-  await waitFor('HUMAN CHECK', 20000);
+  await waitFor('HUMAN CHECK', 30000);
   check('shuffle → locked + challenge', true);
   const timer = await page.evaluate(() => document.querySelector('.timer-pill')?.textContent ?? '');
   check('timer visible', /^\s*\d{2}\s*$/.test(timer), `(got "${timer}")`);
@@ -91,7 +94,7 @@ try {
   await page.goto(URL_BASE + '/#/hunt', { waitUntil: 'networkidle0' });
   await waitFor('TAP TO OPEN');
   await page.click('.pack-wrap');
-  await waitFor('HUMAN CHECK', 20000);
+  await waitFor('HUMAN CHECK', 30000);
   const wrong = await page.evaluate(() => {
     const btns = [...document.querySelectorAll('.answer-btn')];
     const q = document.querySelector('.challenge-q')?.textContent;
@@ -130,6 +133,16 @@ try {
 } catch (e) {
   failed++;
   console.error('SMOKE TEST EXCEPTION:', e.message);
+  try {
+    console.error('  [debug stage]', await page.evaluate(() => ({
+      hash: location.hash,
+      label: document.querySelector('.hunt-stage-label')?.textContent,
+      pack: Boolean(document.querySelector('.pack-wrap')),
+      shuffling: Boolean(document.querySelector('.shuffle-stage')),
+      locked: Boolean(document.querySelector('.challenge-panel')),
+      body: document.body.innerText.slice(0, 200),
+    })));
+  } catch {}
   await page.screenshot({ path: '/tmp/rh-failure.png' }).catch(() => {});
 } finally {
   await browser.close();

@@ -47,7 +47,9 @@ const waitFor = (page, needle, timeout = 15000) =>
 
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--no-sandbox'] });
 const page = await browser.newPage();
-page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+page.on('console', (m) => {
+  if (m.type() === 'error') errors.push(`${m.location().url ?? ''} ${m.text()}`);
+});
 page.on('pageerror', (e) => errors.push(String(e)));
 
 async function runHunt(answerCorrect) {

@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
-import { CARDS, TOTAL_CARDS } from '../data/cards';
+import { TOTAL_CARDS } from '../data/cards';
 import { useGame } from '../game/store';
 import { sfx } from '../game/sounds';
 import { navigate } from '../game/router';
 import CountUp from '../components/CountUp';
+import RobotWorld from '../components/RobotWorld';
 
 export default function Home() {
   const owned = useGame((s) => s.owned);
@@ -13,13 +13,6 @@ export default function Home() {
   const cardsClaimed = useGame((s) => s.cardsClaimed);
 
   const unique = Object.keys(owned).length;
-
-  const floats = useMemo(() => {
-    const epic = CARDS.filter((c) => c.rarity === 'epic');
-    const legendary = CARDS.filter((c) => c.rarity === 'legendary');
-    const rest = CARDS.filter((c) => c.rarity === 'rare');
-    return [...legendary, ...epic.slice(0, 2), ...rest.slice(0, 6 - Math.min(3, legendary.length + 2))].slice(0, 6);
-  }, []);
 
   const go = (s: Parameters<typeof navigate>[0]) => {
     sfx.click();
@@ -58,13 +51,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="hero-cards" aria-hidden="true">
-          {floats.map((c, i) => (
-            <div key={c.id} className={`float-card f${i}`}>
-              <img src={c.image} alt="" loading="lazy" />
-            </div>
-          ))}
-        </div>
+        <RobotWorld />
       </section>
 
       <section className="stat-strip" aria-label="Your stats">
