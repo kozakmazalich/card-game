@@ -45,128 +45,42 @@
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-  background:
-    radial-gradient(1100px 620px at 82% -12%, rgba(91, 208, 138, 0.10), transparent 60%),
-    radial-gradient(900px 620px at 8% 108%, rgba(106, 99, 200, 0.12), transparent 62%),
-    linear-gradient(180deg, #0c0e10 0%, #0c0e10 62%, #101214 100%);
+  background: #000;
 }
 
-.bg-grid {
-  position: absolute;
-  inset: -2px;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(1200px 800px at 50% 30%, rgba(0, 0, 0, 0.9), transparent 75%);
-}
-
-.bg-orb {
+/* cinematic breathing lights across the pure-black background */
+.bg-light {
   position: absolute;
   border-radius: 50%;
   filter: blur(70px);
-  opacity: 0.5;
-  animation: orb-drift 26s ease-in-out infinite alternate;
-}
-.bg-orb.o1 {
-  width: 420px;
-  height: 420px;
-  left: -120px;
-  top: -80px;
-  background: rgba(91, 208, 138, 0.12);
-}
-.bg-orb.o2 {
-  width: 360px;
-  height: 360px;
-  right: -100px;
-  bottom: -60px;
-  background: rgba(139, 135, 217, 0.12);
-  animation-delay: -8s;
-}
-
-@keyframes orb-drift {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(46px, 30px, 0);
-  }
-}
-
-.bg-silhouettes {
-  position: absolute;
-  inset: 0;
-}
-.bg-silhouettes img {
-  position: absolute;
-  width: 130px;
-  height: 130px;
-  object-fit: contain;
-  filter: brightness(0) invert(1);
-  opacity: 0.05;
-  animation: silhouette-float 18s ease-in-out infinite alternate;
-}
-.bg-silhouettes img:nth-child(1) {
-  left: 4%;
-  top: 18%;
-  animation-delay: -3s;
-}
-.bg-silhouettes img:nth-child(2) {
-  right: 5%;
-  top: 26%;
-  width: 180px;
-  height: 180px;
-  animation-delay: -9s;
-  opacity: 0.035;
-}
-.bg-silhouettes img:nth-child(3) {
-  left: 12%;
-  bottom: 8%;
-  animation-delay: -14s;
-  opacity: 0.04;
-}
-
-@keyframes silhouette-float {
-  from {
-    transform: translateY(0) rotate(-4deg);
-  }
-  to {
-    transform: translateY(-26px) rotate(4deg);
-  }
-}
-
-.bg-sparkles {
-  position: absolute;
-  inset: 0;
-}
-.bg-sparkle {
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--green);
   opacity: 0;
-  animation: sparkle 7s ease-in-out infinite;
+  animation: bg-light-life var(--ldur, 14s) ease-in-out var(--ld, 0s) infinite;
 }
-.bg-sparkle.iris {
-  background: var(--iris);
+.bg-light.g {
+  background: radial-gradient(closest-side, rgba(91, 208, 138, 0.16), transparent 72%);
 }
-.bg-sparkle.amber {
-  background: var(--amber);
+.bg-light.i {
+  background: radial-gradient(closest-side, rgba(139, 135, 217, 0.14), transparent 72%);
 }
-
-@keyframes sparkle {
+.bg-light.a {
+  background: radial-gradient(closest-side, rgba(224, 176, 78, 0.11), transparent 72%);
+}
+@keyframes bg-light-life {
   0%,
   100% {
     opacity: 0;
-    transform: translateY(8px) scale(0.6);
   }
-  40% {
-    opacity: 0.8;
-    transform: translateY(-14px) scale(1);
+  18% {
+    opacity: 0.9;
   }
-  60% {
-    opacity: 0.4;
+  46% {
+    opacity: 0.12;
+  }
+  64% {
+    opacity: 0.7;
+  }
+  82% {
+    opacity: 0.25;
   }
 }
 
@@ -591,21 +505,17 @@
   inset: 0;
   background: repeating-linear-gradient(
     90deg,
-    rgba(91, 208, 138, 0.11) 0px,
-    rgba(91, 208, 138, 0.11) 26px,
+    rgba(91, 208, 138, 0.13) 0px,
+    rgba(91, 208, 138, 0.13) 26px,
     transparent 26px,
     transparent 44px,
-    rgba(139, 135, 217, 0.07) 44px,
-    rgba(139, 135, 217, 0.07) 58px,
+    rgba(139, 135, 217, 0.08) 44px,
+    rgba(139, 135, 217, 0.08) 58px,
     transparent 58px,
     transparent 96px
   );
-  animation: rw-road-move 16s linear infinite;
-}
-.rw-road-marks-rev {
-  animation-direction: reverse;
-  animation-duration: 22s;
-  opacity: 0.6;
+  /* 96px period at 24px/s = 4s — in sync with the conveyor carrying the robots. */
+  animation: rw-road-move 4s linear infinite;
 }
 .rw-road-center {
   position: absolute;
@@ -615,7 +525,7 @@
   height: 2px;
   margin-top: -1px;
   background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0 34px, transparent 34px 96px);
-  animation: rw-road-move 16s linear infinite;
+  animation: rw-road-move 4s linear infinite;
   filter: blur(0.3px);
 }
 @keyframes rw-road-move {
@@ -623,7 +533,7 @@
     background-position-x: 0;
   }
   to {
-    background-position-x: 96px;
+    background-position-x: -96px;
   }
 }
 

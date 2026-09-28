@@ -1,44 +1,51 @@
 import { useMemo } from 'react';
-import { CARDS } from '../data/cards';
 
-interface Sparkle {
+/**
+ * Global background: pure solid black with sparse, professional breathing
+ * lights. Every light glows up and fades out on its own randomized rhythm.
+ */
+
+interface Light {
   left: string;
   top: string;
-  delay: string;
+  size: number;
   cls: string;
+  ld: number;
+  ldur: number;
 }
 
-export default function Background() {
-  const silhouettes = useMemo(() => {
-    const picks = [CARDS[7], CARDS[41], CARDS[77]].filter(Boolean);
-    return picks;
-  }, []);
+const PALETTE = ['g', 'i', 'a'];
 
-  const sparkles = useMemo<Sparkle[]>(() => {
-    const palette = ['', ' iris', ' amber'];
-    return Array.from({ length: 26 }, (_, i) => ({
-      left: `${(i * 37.7) % 100}%`,
-      top: `${(i * 53.3 + 11) % 92}%`,
-      delay: `${(i % 9) * 0.8}s`,
-      cls: palette[i % 3],
-    }));
-  }, []);
+export default function Background() {
+  const lights = useMemo<Light[]>(
+    () =>
+      Array.from({ length: 14 }, (_, i) => ({
+        left: `${(i * 41.7 + 6) % 94}%`,
+        top: `${(i * 29.3 + 4) % 90}%`,
+        size: 160 + ((i * 53) % 180),
+        cls: PALETTE[i % 3],
+        ld: -((i * 3.1) % 13),
+        ldur: 11 + ((i * 2.7) % 9),
+      })),
+    [],
+  );
 
   return (
     <div className="bg" aria-hidden="true">
-      <div className="bg-grid" />
-      <div className="bg-orb o1" />
-      <div className="bg-orb o2" />
-      <div className="bg-silhouettes">
-        {silhouettes.map((c, i) => (
-          <img key={i} src={c.image} alt="" loading="lazy" />
-        ))}
-      </div>
-      <div className="bg-sparkles">
-        {sparkles.map((s, i) => (
-          <span key={i} className={`bg-sparkle${s.cls}`} style={{ left: s.left, top: s.top, animationDelay: s.delay }} />
-        ))}
-      </div>
+      {lights.map((l, i) => (
+        <span
+          key={i}
+          className={`bg-light ${l.cls}`}
+          style={{
+            left: l.left,
+            top: l.top,
+            width: l.size,
+            height: l.size,
+            ['--ld' as string]: `${l.ld}s`,
+            ['--ldur' as string]: `${l.ldur}s`,
+          }}
+        />
+      ))}
     </div>
   );
 }

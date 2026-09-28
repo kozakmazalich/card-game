@@ -4,10 +4,11 @@ import type { Rarity, RobotCard } from '../data/types';
 import { sfx } from '../game/sounds';
 
 /**
- * The home world: pure black scene, one continuous moving road, sparse
- * street lamps, and 10 real robots (background-removed, size-normalized)
- * traveling along it. Robots stay clickable — clicking one makes it chase
- * the cursor until clicked again.
+ * The home world: a black scene with one conveyor road. Robots stand
+ * completely still in their slots and are carried forward by the conveyor —
+ * robot and belt move as one connected system. Reaching the edge, a robot
+ * loops back naturally. Clicking a robot still lets it chase the cursor;
+ * releasing it drops it back onto the conveyor.
  */
 
 const PICK_ORDER: Rarity[] = ['legendary', 'epic', 'rare', 'uncommon', 'common'];
@@ -21,6 +22,8 @@ const RARITY_COLOR: Record<Rarity, string> = {
 };
 
 const ROAD_Y = 232;
+const SPEED = 24; // conveyor px/s (kept in sync with the road-mark animation)
+const MARGIN = 110; // off-screen margin used for the seamless loop
 
 const LAMPS = [
   { left: '6%', ld: -2, ldur: 13 },
@@ -33,16 +36,11 @@ const LAMPS = [
 
 interface Sprite {
   card: RobotCard;
+  /** Fixed slot on the conveyor, as a fraction of one loop length. */
+  slotFrac: number;
   y: number;
-  speed: number;
-  dir: 1 | -1;
-  x: number; // scene-width %
-  bobFreq: number;
-  bobAmp: number;
-  bobPhase: number;
   tilt: number;
   z: number;
-  idleUntil: number;
   following: boolean;
   fx: number;
   fy: number;
@@ -53,19 +51,13 @@ function makeSprites(): Sprite[] {
   const picks: RobotCard[] = PICK_ORDER.flatMap((r) => CARDS.filter((c) => c.rarity === r).slice(0, 2));
   return picks.map((card, i) => {
     const r = (n: number) => (Math.abs(Math.sin(i * 9301 + n * 49297)) * 233280) % 1;
-    const y = ROAD_Y + (i % 2 === 0 ? 6 : -5);
+    const y = ROAD_Y + (i % 2 === 0 ? 5 : -4);
     return {
       card,
+      slotFrac: i / picks.length,
       y,
-      speed: 6 + r(1) * 9,
-      dir: i % 2 === 0 ? 1 : -1,
-      x: 4 + ((i * 9.4) % 88),
-      bobFreq: 4.5 + r(2) * 3.5,
-      bobAmp: 2.6 + r(3) * 3.2,
-      bobPhase: r(4) * Math.PI * 2,
-      tilt: (r(5) - 0.5) * 4,
+      tilt: (r(5) - 0.5) * 3,
       z: 10 + Math.round((y - 220) / 4),
-      idleUntil: 0,
       following: false,
       fx: 0,
       fy: 0,
@@ -109,9 +101,15 @@ export default function RobotWorld() {
     };
     window.addEventListener('pointermove', onMove, { passive: true });
 
+    let scroll = 0; // conveyor displacement in px
+
     const release = (s: Sprite, wrap: HTMLElement | null) => {
-      s.x = Math.min(112, Math.max(-12, ((s.fx - rect.left) / Math.max(1, rect.width)) * 100));
-      s.y = Math.min(rect.height - 20, Math.max(-90, s.fy - rect.top));
+      // Re-attach to the conveyor at the exact spot where the robot stands,
+      // preserving its position relative to the belt.
+      const L = rect.width + 2 * MARGIN;
+      const screenX = s.fx - rect.left;
+      s.slotFrac = ((((screenX + MARGIN - scroll) % L) + L) % L) / L;
+      s.y = ROAD_Y;
       s.following = false;
       if (wrap) {
         wrap.style.position = 'absolute';
@@ -179,11 +177,18 @@ export default function RobotWorld() {
       });
     };
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const placeStatic = () => {
+      const L = rect.width + 2 * MARGIN;
       sprites.forEach((s, i) => {
-        const w = wraps[i];
-        if (w) w.style.transform = `translate3d(${(s.x / 100) * rect.width}px, ${s.y}px, 0)`;
+        const wrap = wraps[i];
+        if (!wrap) return;
+        const x = (s.slotFrac * L + scroll) % L - MARGIN;
+        wrap.style.transform = `translate3d(${x}px, ${s.y}px, 0)`;
       });
+    };
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      placeStatic();
       return cleanup;
     }
 
@@ -193,6 +198,8 @@ export default function RobotWorld() {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const t = now * 0.001;
+      const L = rect.width + 2 * MARGIN;
+      scroll += SPEED * dt;
 
       for (let i = 0; i < sprites.length; i++) {
         const s = sprites[i];
@@ -210,37 +217,19 @@ export default function RobotWorld() {
           s.fx += vx;
           s.fy += vy;
           const bank = Math.max(-16, Math.min(16, vx * 1.6));
-          const bob = Math.sin(t * 9 + s.bobPhase) * 5;
+          const bob = Math.sin(t * 9 + s.tilt) * 5;
           wrap.style.transform = `translate3d(${s.fx - 75}px, ${s.fy - 150}px, 0)`;
-          img.style.transform = `scale(${s.dir * 1.55}, 1.55) translateY(${bob}px) rotate(${bank}deg)`;
+          img.style.transform = `scale(1.55, 1.55) translateY(${bob}px) rotate(${bank}deg)`;
           sh.style.opacity = '0';
           aura.style.opacity = '0.9';
           tag.style.opacity = '1';
           continue;
         }
 
-        if (s.idleUntil) {
-          if (now > s.idleUntil) {
-            s.idleUntil = 0;
-            if (Math.random() < 0.4) s.dir = (s.dir * -1) as 1 | -1;
-          }
-        } else {
-          s.x += s.dir * s.speed * dt;
-          if (s.x > 116) {
-            s.x = 116;
-            s.dir = -1;
-          } else if (s.x < -16) {
-            s.x = -16;
-            s.dir = 1;
-          }
-          if (Math.random() < dt * 0.14) s.idleUntil = now + 800 + Math.random() * 1900;
-        }
-
-        const bob = s.idleUntil ? 0 : Math.sin(t * s.bobFreq + s.bobPhase) * s.bobAmp;
-        const sway = s.idleUntil ? 0 : Math.sin(t * s.bobFreq * 2 + s.bobPhase) * 1.1;
-        const lift = s.hover ? 1.08 : 1;
-        wrap.style.transform = `translate3d(${(s.x / 100) * rect.width}px, ${s.y}px, 0)`;
-        img.style.transform = `scale(${s.dir * lift}, ${lift}) translateY(${bob}px) rotate(${s.tilt + sway}deg)`;
+        // Carried by the conveyor — the robot itself stays still.
+        const x = ((s.slotFrac * L + scroll) % L) - MARGIN;
+        wrap.style.transform = `translate3d(${x}px, ${s.y}px, 0)`;
+        img.style.transform = `scale(1, 1) rotate(${s.tilt}deg)`;
         sh.style.opacity = '0.32';
         aura.style.opacity = s.hover ? '0.55' : '0';
         tag.style.opacity = s.hover ? '1' : '0';
@@ -256,7 +245,7 @@ export default function RobotWorld() {
   }, [sprites]);
 
   return (
-    <div className="rw-scene" ref={sceneRef} aria-label="Robot world — robots travel a moving road. Click one to make it follow your cursor.">
+    <div className="rw-scene" ref={sceneRef} aria-label="Robot conveyor — robots travel on a moving road. Click one to make it follow your cursor.">
       <div className="rw-lamps" aria-hidden="true">
         {LAMPS.map((l, i) => (
           <span key={i} className="rw-lamp" style={{ left: l.left, ['--ld' as string]: `${l.ld}s`, ['--ldur' as string]: `${l.ldur}s` }}>
@@ -270,7 +259,6 @@ export default function RobotWorld() {
       <div className="rw-road" aria-hidden="true">
         <span className="rw-road-edge rw-road-top" />
         <span className="rw-road-marks" />
-        <span className="rw-road-marks rw-road-marks-rev" />
         <span className="rw-road-center" />
         <span className="rw-road-edge rw-road-bottom" />
       </div>
@@ -282,7 +270,7 @@ export default function RobotWorld() {
           role="button"
           tabIndex={-1}
           title={s.card.name}
-          style={{ zIndex: s.z, transform: `translate3d(${s.x}px, ${s.y}px, 0)` }}
+          style={{ zIndex: s.z, transform: `translate3d(${s.slotFrac * 100}px, ${s.y}px, 0)` }}
         >
           <span className="rw-aura" data-aura={i} style={{ ['--rc' as string]: RARITY_COLOR[s.card.rarity] }} />
           <img
@@ -292,7 +280,7 @@ export default function RobotWorld() {
             alt=""
             decoding="async"
             draggable={false}
-            style={{ transform: `scale(${s.dir}, 1)` }}
+            style={{ transform: `scale(1, 1) rotate(${s.tilt}deg)` }}
           />
           <span className="rw-tag" data-tag={i}>
             <strong>{s.card.name}</strong>
