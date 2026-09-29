@@ -27,6 +27,7 @@ interface ShelfRobot {
   falling: boolean;
   vanish: number; // 0..1 while being swallowed by the pit
   squash: number; // 0..1 landing squash animation
+  fadeIn: number; // 0..1 entrance fade for replacement robots
 }
 
 const GRAVITY = 1500;
@@ -70,6 +71,7 @@ export default function ClawMachine() {
       falling: false,
       vanish: 0,
       squash: 0,
+      fadeIn: 0,
     }));
   }, []);
 
@@ -120,6 +122,11 @@ export default function ClawMachine() {
       beltLen: Math.max(800, rect.width * 0.76 - 60 + BELT_MARGIN),
     });
     const grabLen = () => geo().beltY - ROBOT_SIZE / 2 - (geo().railY + 10);
+    const pitRange = (g: ReturnType<typeof geo>) => ({ x1: g.boxX1 + 8, x2: g.boxX2 - 8 });
+    const overPit = (x: number, g: ReturnType<typeof geo>) => {
+      const P = pitRange(g);
+      return x >= P.x1 && x <= P.x2;
+    };
 
     let beltScroll = 0;
     let clawPulse = 0;
@@ -178,22 +185,40 @@ export default function ClawMachine() {
     };
 
     const replaceRobot = (idx: number) => {
-      const g = geo();
       robots[idx] = {
         card: selectRandomCard(),
-        beltFrac: robots[idx].beltFrac,
-        x: g.boxX1 - 120,
-        y: -ROBOT_SIZE - 40,
+        beltFrac: 0.9 + Math.random() * 0.06,
+        x: 0,
+        y: geo().beltY - ROBOT_SIZE,
         vx: 0,
         vy: 0,
-        falling: true,
+        falling: false,
         vanish: 0,
         squash: 0,
+        fadeIn: 1,
       };
       const el = robotEls.get(idx);
       if (el) {
         el.img.src = robots[idx].card.image.replace('/robots/', '/robots-cutout/');
         el.img.alt = robots[idx].card.name;
+      }
+    };
+
+    const spawnCoins = () => {
+      const g = geo();
+      const cx = (g.boxX1 + g.boxX2) / 2;
+      const cy = g.beltY - 14;
+      for (let i = 0; i < 14; i++) {
+        const wrap = document.createElement('span');
+        wrap.className = 'cm-coin';
+        const ang = Math.random() * Math.PI;
+        const dist = 70 + Math.random() * 95;
+        const dirX = Math.random() < 0.5 ? -1 : 1;
+        wrap.style.cssText = `left:${cx}px;top:${cy}px;--px:${(Math.cos(ang) * dist * dirX).toFixed(1)}px;--py:${(-40 - Math.sin(ang) * dist).toFixed(1)}px;`;
+        const face = document.createElement('i');
+        wrap.appendChild(face);
+        scene.appendChild(wrap);
+        window.setTimeout(() => wrap.remove(), 1100);
       }
     };
 
@@ -205,6 +230,9 @@ export default function ClawMachine() {
       freeze(95);
       flashA = 0.85;
       gulp = 1;
+      spawnCoins();
+      setHint('CAUGHT!');
+      window.setTimeout(() => setHint('MOVE THE CLAW · HOLD TO GRAB A ROBOT'), 1800);
       push(`CAUGHT ${card.name} · #${card.id}`, 'ok');
     };
 
@@ -222,17 +250,20 @@ export default function ClawMachine() {
       const tipX = S.tx;
       const payloadX = tipX + ROPE_LEN * Math.sin(S.theta);
       const g = geo();
-      const inBox = payloadX >= g.boxX1 + 14 && payloadX <= g.boxX2 - 14;
+      const inBox = overPit(payloadX, g);
+      const r = robots[S.holdIdx];
+      detach();
       if (inBox) {
-        const idx = S.holdIdx;
-        const r = robots[idx];
-        detach();
-        funCaught(r.card);
-        replaceRobot(idx);
-        setHint('CAUGHT!');
-        window.setTimeout(() => setHint('MOVE THE CLAW · HOLD TO GRAB A ROBOT'), 1800);
+        // Drops into the pit: falls, gets swallowed and vanishes with a
+        // golden coin splash (handled by the pit-swallow path in tick).
+        r.falling = true;
+        r.x = payloadX;
+        r.y = g.beltY - ROBOT_SIZE - 30;
+        r.vx = S.omega * ROPE_LEN * Math.cos(S.theta) * 0.4;
+        r.vy = 60;
+        sfx.clawOpen();
+        setHint('INTO THE PIT!');
       } else {
-        const r = robots[S.holdIdx];
         r.falling = true;
         r.x = payloadX;
         r.y = g.beltY - ROBOT_SIZE - 20;
@@ -241,7 +272,6 @@ export default function ClawMachine() {
         sfx.clawSlip();
         setHint('IT BOUNCED BACK ON THE BELT');
         push('BOUNCED BACK ON THE BELT', 'warn');
-        detach();
       }
     };
 
@@ -346,6 +376,8 @@ export default function ClawMachine() {
     let raf = 0;
     let last = performance.now();
     let lastVel = 0;
+    let lastSign = 0;
+    let reversal = 0; // 1 right after a direction change, decays over ~1.2s
 
     const tick = (now: number) => {
       const dtF = Math.min(0.05, (now - last) / 1000);
@@ -417,9 +449,16 @@ export default function ClawMachine() {
         S.cableLen = 46;
         S.omega += (-(GRAVITY / ROPE_LEN) * Math.sin(S.theta) - 0.55 * S.omega + (S.aSmooth / ROPE_LEN) * Math.cos(S.theta)) * dt;
         S.theta += S.omega * dt;
+        // Direction-change detector: the robot only loses grip when the
+        // player reverses sharply while it is already swinging wide.
+        const as = Math.sign(S.aSmooth);
+        if (as !== 0) {
+          if (lastSign !== 0 && as !== lastSign) reversal = 1;
+          lastSign = as;
+        }
+        reversal = Math.max(0, reversal - dt * 0.8);
         const hardSwing = Math.abs(S.theta) > SLIP_ANGLE && Math.sign(S.theta) === Math.sign(S.omega);
-        const jerking = Math.abs(S.aSmooth) > 1300;
-        if (S.holdName && now > S.carryStart + 450 && hardSwing && jerking) {
+        if (S.holdName && now > S.carryStart + 450 && hardSwing && reversal > 0 && Math.abs(S.aSmooth) > 1000) {
           sfx.clawSlip();
           shake(0.32);
           push('TOO FAST! THE ROBOT SLIPPED', 'warn');
@@ -451,7 +490,7 @@ export default function ClawMachine() {
         const py = trolleyY + 10 + cableLen + ROPE_LEN * Math.cos(S.theta);
         heldEl.style.transform = `translate3d(${px - ROBOT_SIZE / 2}px, ${py - ROBOT_SIZE / 2}px, 0) rotate(${S.theta * 40}deg)`;
         heldEl.style.opacity = '1';
-        boxEl.classList.toggle('ready', px >= g.boxX1 && px <= g.boxX2);
+        boxEl.classList.toggle('ready', overPit(px, g));
       } else {
         heldEl.style.opacity = '0';
         boxEl.classList.remove('ready');
@@ -462,16 +501,14 @@ export default function ClawMachine() {
         const el = robotEls.get(i);
         if (!el) return;
         const isHeld = i === S.holdIdx && S.holdName !== null;
-        el.wrap.style.opacity = isHeld ? '0' : '1';
+        const alpha = r.fadeIn > 0 ? 1 - r.fadeIn : 1;
+        el.wrap.style.opacity = isHeld ? '0' : String(alpha);
 
         if (r.falling) {
           r.vy += GRAVITY * 1.15 * dt;
           r.x += r.vx * dt;
           const ny = r.y + r.vy * dt;
-          // swallowed by the pit
-          if (r.vy > 0 && r.x >= g.boxX1 + 10 && r.x <= g.boxX2 - 10 && ny > g.beltY - ROBOT_SIZE * 0.4) {
-            r.vanish = Math.max(r.vanish, 0.001);
-          }
+          const overP = overPit(r.x, g);
           if (r.vanish > 0) {
             r.vanish += dt * 2.2;
             r.y += r.vy * dt;
@@ -481,7 +518,11 @@ export default function ClawMachine() {
               replaceRobot(i);
               return;
             }
-          } else if (ny >= g.beltY - ROBOT_SIZE) {
+          } else if (overP && r.vy > 0 && ny > g.beltY - ROBOT_SIZE * 0.4) {
+            // swallowed by the pit — no floor here, keep sinking and vanish
+            r.vanish = Math.max(r.vanish, 0.001);
+            r.y = ny;
+          } else if (!overP && ny >= g.beltY - ROBOT_SIZE) {
             r.y = g.beltY - ROBOT_SIZE;
             if (r.vy > 90) {
               sfx.clawThud();
@@ -501,6 +542,7 @@ export default function ClawMachine() {
         } else {
           r.y = g.beltY - ROBOT_SIZE;
           r.x = restingX(r);
+          if (r.fadeIn > 0) r.fadeIn = Math.max(0, r.fadeIn - dt * 2.5);
         }
 
         r.squash *= Math.pow(0.002, dt);
