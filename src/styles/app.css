@@ -402,6 +402,8 @@
 .cm-stage {
   position: absolute;
   inset: 0;
+  will-change: transform;
+  transform-origin: center;
 }
 
 /* marquee */
@@ -453,26 +455,54 @@
 }
 .cm-trolley {
   position: absolute;
-  top: calc(16% - 13px);
-  left: -28px;
-  width: 56px;
-  height: 26px;
-  border-radius: 8px;
+  top: calc(16% - 15px);
+  left: -30px;
+  width: 60px;
+  height: 30px;
+  border-radius: 6px;
   border: 1px solid var(--line-strong);
-  background: linear-gradient(180deg, #2a313b, #16191c);
-  box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, #3a434f 0%, #22262c 55%, #15181c 100%);
+  box-shadow:
+    0 10px 20px -8px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.5);
   will-change: transform;
+}
+.cm-trolley::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: 4px;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.05));
+}
+.cm-wheel {
+  position: absolute;
+  top: 24px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #7d8894, #262b31 70%);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+}
+.cm-wheel-l {
+  left: 10px;
+}
+.cm-wheel-r {
+  right: 10px;
 }
 .cm-trolley-eye {
   position: absolute;
   left: 50%;
-  bottom: 4px;
-  width: 6px;
-  height: 6px;
-  margin-left: -3px;
+  bottom: 5px;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
   border-radius: 50%;
   background: var(--green);
-  box-shadow: 0 0 10px var(--green);
+  box-shadow: 0 0 12px var(--green);
 }
 
 /* cable */
@@ -499,24 +529,38 @@
 }
 .cm-claw-hub {
   position: absolute;
-  left: -10px;
-  top: -8px;
-  width: 20px;
-  height: 14px;
+  left: -12px;
+  top: -10px;
+  width: 24px;
+  height: 18px;
   border-radius: 5px;
   border: 1px solid var(--line-strong);
-  background: linear-gradient(180deg, #3a424d, #1a1e23);
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.04) 45%),
+    linear-gradient(180deg, #434c59, #191d22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 10px -4px rgba(0, 0, 0, 0.9);
 }
 .cm-prong {
   position: absolute;
   left: -3px;
   top: 6px;
   width: 6px;
-  height: 38px;
+  height: 40px;
   border-radius: 0 0 4px 4px;
-  background: linear-gradient(180deg, #98a3b2, #3a424d);
+  background: linear-gradient(90deg, #59626e 0%, #9aa5b4 45%, #59626e 100%);
+  box-shadow: inset 0 -6px 8px rgba(0, 0, 0, 0.45);
   transform-origin: top center;
   transition: transform 0.16s ease;
+}
+.cm-prong::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  bottom: -4px;
+  width: 10px;
+  height: 9px;
+  border-radius: 0 0 7px 7px;
+  background: linear-gradient(180deg, #8d97a5, #2e343c);
 }
 .cm-prong-r {
   transition-delay: 0.04s;
@@ -634,9 +678,27 @@
   bottom: 4%;
   border: 1px dashed color-mix(in srgb, var(--green) 40%, transparent);
   border-top: none;
-  background: linear-gradient(180deg, rgba(91, 208, 138, 0.05), rgba(0, 0, 0, 0.6));
+  background:
+    radial-gradient(60% 50% at 50% 85%, rgba(91, 208, 138, 0.12), transparent 70%),
+    linear-gradient(180deg, rgba(91, 208, 138, 0.05), rgba(0, 0, 0, 0.65));
   z-index: 6;
   transition: box-shadow 0.2s, border-color 0.2s;
+  will-change: transform;
+}
+.cm-box::before {
+  content: '';
+  position: absolute;
+  left: -3.2%;
+  right: -3.2%;
+  top: -2px;
+  height: 5px;
+  background: linear-gradient(90deg, transparent, rgba(91, 208, 138, 0.55) 20%, rgba(91, 208, 138, 0.55) 80%, transparent);
+  filter: blur(0.4px);
+  opacity: 0.7;
+}
+.cm-box.ready::before {
+  opacity: 1;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--green) 70%, transparent);
 }
 .cm-box.ready {
   border-color: var(--green);
@@ -676,6 +738,95 @@
 }
 
 /* spotlights */
+.cm-spot-r {
+  right: 6%;
+  background: linear-gradient(180deg, rgba(91, 208, 138, 0.06), transparent 80%);
+}
+.cm-spot-l {
+  left: 6%;
+}
+
+/* 3D cabinet */
+.cm-cab {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.cm-cab-back {
+  position: absolute;
+  left: 3.5%;
+  right: 3.5%;
+  top: 12%;
+  bottom: 5.5%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.008) 40%, rgba(255, 255, 255, 0.03) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+.cm-cab-side {
+  position: absolute;
+  top: 12%;
+  bottom: 5.5%;
+  width: 3.5%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+  clip-path: polygon(0 0, 100% 3%, 100% 97%, 0 100%);
+}
+.cm-cab-side-l {
+  left: 0;
+  transform: scaleX(-1);
+}
+.cm-cab-side-r {
+  right: 0;
+}
+.cm-cab-glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0.004) 30%, rgba(255, 255, 255, 0.02));
+}
+.cm-cab-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.05) 40%, rgba(139, 200, 255, 0.04) 48%, rgba(255, 255, 255, 0.03) 55%, transparent 70%);
+  background-size: 260% 100%;
+  animation: holo-sweep 8s linear infinite;
+}
+.cm-cab-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.6);
+}
+.cm-cab-frame {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 0 40px -18px rgba(139, 135, 217, 0.35);
+}
+
+/* impact flash */
+.cm-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 86% 78%, rgba(255, 255, 255, 0.5), rgba(204, 255, 0, 0.16) 45%, transparent 75%);
+}
+
+/* contact poof particles */
+.cm-poof {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: particle-fly 0.8s var(--ease-out) forwards;
+}
+
+/* dust in the spotlight beams */
 .cm-spot {
   position: absolute;
   top: 0;
@@ -683,39 +834,47 @@
   height: 84%;
   pointer-events: none;
   opacity: 0.5;
-  background: linear-gradient(180deg, rgba(139, 135, 217, 0.05), transparent 80%);
+  background: linear-gradient(180deg, rgba(139, 135, 217, 0.06), transparent 80%);
   clip-path: polygon(42% 0%, 100% 100%, 0% 100%);
   filter: blur(3px);
 }
-.cm-spot-r {
-  right: 6%;
-  background: linear-gradient(180deg, rgba(91, 208, 138, 0.05), transparent 80%);
-}
-.cm-spot-l {
-  left: 6%;
-}
-
-/* glass */
-.cm-glass {
+.cm-dust {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.005) 30%, rgba(255, 255, 255, 0.02));
-  border: 1px solid var(--line-strong);
+  left: 30%;
+  top: 10%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(200, 210, 255, 0.55);
+  animation: cm-dust-fall 6s linear infinite;
 }
-.cm-glass::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.05) 40%, rgba(139, 200, 255, 0.04) 48%, rgba(255, 255, 255, 0.03) 55%, transparent 70%);
-  background-size: 260% 100%;
-  animation: holo-sweep 7s linear infinite;
+.cm-dust.d2 {
+  left: 55%;
+  animation-duration: 8s;
+  animation-delay: -2s;
+  width: 2px;
+  height: 2px;
 }
-.cm-glass::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.55);
+.cm-dust.d3 {
+  left: 70%;
+  animation-duration: 7s;
+  animation-delay: -4s;
+}
+@keyframes cm-dust-fall {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  85% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(430px);
+    opacity: 0;
+  }
 }
 
 /* hud */
@@ -741,8 +900,11 @@
 }
 @keyframes cm-count-pop {
   0% {
-    transform: scale(1.5);
+    transform: scale(1.8);
     color: var(--green);
+  }
+  55% {
+    transform: scale(0.85);
   }
   100% {
     transform: scale(1);
